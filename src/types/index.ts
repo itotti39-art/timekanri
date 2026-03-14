@@ -8,11 +8,16 @@ export type User = {
 
 export type ShiftState = 'idle' | 'working' | 'resting' | 'finished';
 
+export type RestRecord = {
+  start: string;
+  end: string | null;
+};
+
 export type WorkSession = {
   id: string;
   clockIn: string;
   clockOut: string | null;
-  rests: { start: string; end: string | null }[];
+  rests: RestRecord[];
 };
 
 export type TimeRecord = {

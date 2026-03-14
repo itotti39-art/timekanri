@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useStore } from '../store';
 import { format, startOfMonth, endOfMonth, isWithinInterval } from 'date-fns';
 import { Download, FileText, ChevronLeft, ChevronRight, Clock, DollarSign } from 'lucide-react';
-import type { TimeRecord } from '../types';
+import type { TimeRecord, WorkSession, RestRecord } from '../types';
 
 export const Monthly = () => {
   const users = useStore(state => state.users);
@@ -19,7 +19,7 @@ export const Monthly = () => {
     ? monthRecords 
     : monthRecords.filter(r => r.userId === selectedUserId);
 
-  const calculateSessionMinutes = (session: any) => {
+  const calculateSessionMinutes = (session: WorkSession) => {
     if (!session.clockIn || !session.clockOut) return 0;
     const toMinutes = (time: string) => {
       const [h, m] = time.split(':').map(Number);
@@ -28,7 +28,7 @@ export const Monthly = () => {
     const startMins = toMinutes(session.clockIn);
     const endMins = toMinutes(session.clockOut);
     let restMins = 0;
-    session.rests.forEach((r: any) => {
+    session.rests.forEach((r: RestRecord) => {
       if (r.start && r.end) {
         restMins += (toMinutes(r.end) - toMinutes(r.start));
       }

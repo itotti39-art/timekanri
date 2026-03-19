@@ -140,10 +140,12 @@ export const CalendarView = () => {
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-gray-50 text-gray-500 text-sm uppercase tracking-wider">
-              <th className="p-4 font-medium border-b w-48">日付</th>
-              <th className="p-4 font-medium border-b">勤務詳細 (出勤 - 退勤 / 休憩)</th>
-              <th className="p-4 font-medium border-b w-32 text-center">合計</th>
+            <tr className="bg-gray-50 text-gray-500 text-sm">
+              <th className="p-4 font-medium border-b w-32"></th>
+              <th className="p-4 font-medium border-b">出勤</th>
+              <th className="p-4 font-medium border-b">退勤</th>
+              <th className="p-4 font-medium border-b">休憩</th>
+              <th className="p-4 font-medium border-b">稼働時間</th>
               <th className="p-4 font-medium border-b w-24 text-center">操作</th>
             </tr>
           </thead>
@@ -155,18 +157,18 @@ export const CalendarView = () => {
 
               return (
                 <tr key={day.toISOString()} className={`hover:bg-gray-50 transition ${isToday ? 'bg-blue-50/50' : ''}`}>
-                  <td className="p-4 align-top">
-                    <div className="flex items-center gap-2">
+                  <td className="p-4 align-top border-b border-gray-50">
+                    <div className="flex items-center gap-1.5">
                       <span className={`font-medium ${isToday ? 'text-blue-700' : 'text-gray-900'}`}>
                         {format(day, 'd')}日
                       </span>
-                      <span className="text-sm text-gray-500">
+                      <span className="text-sm text-gray-400">
                         ({['日', '月', '火', '水', '木', '金', '土'][day.getDay()]})
                       </span>
                     </div>
                   </td>
-                  <td className="p-4">
-                    {isEditing ? (
+                  {isEditing ? (
+                    <td colSpan={4} className="p-4 border-b border-gray-50">
                       <div className="space-y-4">
                         {editSessions.map((session, sIdx) => (
                           <div key={sIdx} className="bg-gray-50 p-3 rounded-lg border border-gray-200 space-y-3">
@@ -259,36 +261,36 @@ export const CalendarView = () => {
                           <Plus className="w-4 h-4" /> 勤務セッションを追加
                         </button>
                       </div>
-                    ) : (
-                      <div className="space-y-2">
-                        {record?.sessions.map((s, idx) => (
-                          <div key={idx} className="flex flex-wrap items-center gap-x-4 gap-y-1">
-                            <div className="flex items-center gap-2">
-                              <span className="font-mono text-gray-700 bg-gray-50 px-1.5 py-0.5 rounded border border-gray-100">
-                                {s.clockIn} - {s.clockOut || '--:--'}
-                              </span>
-                            </div>
-                            <div className="flex gap-1">
-                              {s.rests.map((r, ri) => (
-                                <span key={ri} className="text-[10px] bg-orange-50 text-orange-700 px-1.5 py-0.5 rounded border border-orange-100">
-                                  休: {r.start}-{r.end || '...'}
-                                </span>
-                              ))}
-                            </div>
+                    </td>
+                  ) : (
+                    <>
+                      <td className="p-4 align-top text-gray-700 border-b border-gray-50">
+                        {record?.sessions.length ? record.sessions.map((s, idx) => (
+                          <div key={idx} className="min-h-[24px]">{s.clockIn || '-'}</div>
+                        )) : '-'}
+                      </td>
+                      <td className="p-4 align-top text-gray-700 border-b border-gray-50">
+                        {record?.sessions.length ? record.sessions.map((s, idx) => (
+                          <div key={idx} className="min-h-[24px]">{s.clockOut || '-'}</div>
+                        )) : '-'}
+                      </td>
+                      <td className="p-4 align-top text-gray-700 text-sm border-b border-gray-50">
+                        {record?.sessions.length ? record.sessions.map((s, idx) => (
+                          <div key={idx} className="min-h-[24px]">
+                            {s.rests.length > 0 
+                              ? s.rests.map((r, ri) => <span key={ri} className="mr-2">{r.start}-{r.end || ''}</span>) 
+                              : '-'}
                           </div>
-                        )) || <span className="text-gray-300">-</span>}
-                      </div>
-                    )}
-                  </td>
-                  <td className="p-4 text-center align-top">
-                    {!isEditing && record && record.sessions.length > 0 ? (
-                      <span className="inline-flex items-center gap-1 font-medium text-green-700 bg-green-50 px-2.5 py-1 rounded-md text-sm">
-                        <Clock className="w-3.5 h-3.5" />
-                        {calculateHours(record)}h
-                      </span>
-                    ) : '-'}
-                  </td>
-                  <td className="p-4 text-center align-top">
+                        )) : '-'}
+                      </td>
+                      <td className="p-4 align-top text-gray-700 border-b border-gray-50">
+                        {record?.sessions.length ? (
+                          <span className="font-medium text-gray-900">{calculateHours(record)}</span>
+                        ) : '-'}
+                      </td>
+                    </>
+                  )}
+                  <td className="p-4 text-center align-top border-b border-gray-50">
                     {isEditing ? (
                       <div className="flex flex-col gap-2">
                         <button 
